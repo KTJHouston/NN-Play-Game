@@ -24,26 +24,20 @@ class Neural_Net(object):
 		self.net_values.set_weight(0, w)
 		self.net_values.set_bias(0, 1.)
 		w = []
-		for h in range(self.layers[1]):
+		for o in range(self.layers[1]):
 			temp = []
-			for i in range(self.layers[2]):
+			for h in range(self.layers[2]):
 				temp.append(random())
 			w.append(np.array(temp))
 		self.net_values.set_weight(1, w)
 		self.net_values.set_bias(1, 1.)
 	
 	def init_functions(self):
-		self.calculate1 = function(
+		self.calculate = function(
 			[
-				self.input_layer, 
+				self.input_layer,
 				self.weights_layer_0,
-				self.bias_layer_0
-			], 
-			self.hidden_layer
-		)
-		self.calculate2 = function(
-			[
-				self.hidden_layer_v, 
+				self.bias_layer_0,
 				self.weights_layer_1,
 				self.bias_layer_1
 			],
@@ -57,14 +51,12 @@ class Neural_Net(object):
 		self.bias_layer_0 = T.scalar('bias_layer_0')
 		self.hidden_layer = 1 / (1 + T.exp(-T.dot(self.input_layer, self.weights_layer_0) - self.bias_layer_0))
 		
-		self.hidden_layer_v = T.vector('hidden_layer_v')
 		self.weights_layer_1 = T.matrix('weights_layer_1')
 		self.bias_layer_1 = T.scalar('bias_layer_1')
-		self.output_layer = 1 / (1 + T.exp(-T.dot(self.hidden_layer_v, self.weights_layer_1) - self.bias_layer_1))
+		self.output_layer = 1 / (1 + T.exp(-T.dot(self.hidden_layer, self.weights_layer_1) - self.bias_layer_1))
 	
 	def predict(self, inputs):
-		hidden = self.calculate1(inputs, self.net_values.get_weight(0), self.net_values.get_bias(0))
-		output = self.calculate2(hidden, self.net_values.get_weight(1), self.net_values.get_bias(1))
+		output = self.calculate(inputs, self.net_values.get_weight(0), self.net_values.get_bias(0), self.net_values.get_weight(1), self.net_values.get_bias(1))
 		return output
 
 
