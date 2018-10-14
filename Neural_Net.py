@@ -6,14 +6,14 @@ import numpy as np
 
 class Neural_Net(object):
 	
-	def __init__(self, layers):
+	def __init__(self, layers, learning_rate):
 		'''
 		layers is a list of the number of nodes per layer in the neural net.
 		The first is the number of input nodes. The last is the number of output nodes.
 		The number in between are hidden layers. Minimum of 1 hidden layer.
 		'''
 		self.layers = layers
-		self.learning_rate = 0.01
+		self.learning_rate = learning_rate
 		
 		self.init_variables()
 		self.init_functions()
@@ -112,7 +112,7 @@ class Neural_Net(object):
 		#Build equations
 		self.hiddens.append(T.nnet.sigmoid(T.dot(self.inputs, self.weights[0]) + self.biases[0]))
 		
-		for l in range(1, len(self.weights)):
+		for l in range(1, len(self.weights)-1):
 			self.hiddens.append(T.nnet.sigmoid(T.dot(self.hiddens[l-1], self.weights[l]) + self.biases[l]))
 		
 		self.outputs = T.nnet.sigmoid(T.dot(self.hiddens[len(self.hiddens)-1], self.weights[len(self.weights)-1]) + self.biases[len(self.biases)-1])
@@ -136,5 +136,66 @@ class Neural_Net(object):
 		predict_inputs = [inputs]
 		predict_inputs.extend(self.W)
 		predict_inputs.extend(self.B)
-		output = self.predict_function(*predict_inputs)
-		return output
+		return self.predict_function(*predict_inputs)
+	
+	def train(self, inputs):
+		'''
+		Computes a collapsed output with the neural net from the inputes given. 
+		Then, saves the gradient changes based on the collapsed output. These 
+		changes can be rewarded by calling the 'reward' function.
+		'''
+		p = self.predict(inputs)
+		c = self.collapse(p)
+		g = self.gradient(inputs, c)
+		self.update(g)
+		return c
+	
+	def gradient(self, input, desired_output):
+		'''
+		Computes the gradient to adjust weights and biases, based on the 
+		input and desired_output given.
+		'''
+		grad_inputs = [input]
+		grad_inputs.extend(self.W)
+		grad_inputs.extend(self.B)
+		grad_inputs.append(desired_output)
+		return self.grad_function(*grad_inputs)
+	
+	def update(self, gradient):
+		'''
+		Saves the gradient to the list of changes to eventually be 
+		applied to the weights and biases of the neural net.
+		'''
+		g = 0
+		for w in range(0, len(self.WP)):
+			self.WP[w] = self.WP[w] - self.learning_rate * gradient[g]
+			g = g + 1
+		for b in range(0, len(self.BP)):
+			self.BP[b] = self.BP[b] - self.learning_rate * gradient[g]
+			g = g + 1
+	
+	def reward(self, is_positive):
+		'''
+		Applies the list of changes to the neural net, either as 
+		positive or negative reinforcement based on the boolean 
+		value given.
+		'''
+		if is_positive:
+			p = 1
+		else:
+			p = -1
+		for w in range(0, len(self.W)):
+			self.W[w] = self.W[w] + (p * self.WP[w])
+		for b in range(0, len(self.B)):
+			self.B[b] = self.B[b] + (p * self.BP[b])
+		for w in range(0, len(self.WP)):
+			self.WP[w] = self.WPblank[w]
+		for b in range(0, len(self.BP)):
+			self.BP[b] = self.BPblank[b]
+	
+	def __str__(self):
+		out = ''
+		for i in range(0, len(self.W)):
+			out = out + str(self.W[i]) + '\n'
+			out = out + str(self.B[i]) + '\n'
+		return out

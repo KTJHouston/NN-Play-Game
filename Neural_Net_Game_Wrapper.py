@@ -24,11 +24,24 @@ def create_greatest(input_num, low, high):
 			index = i
 		else:
 			inp.append(r)
-		out.append(0)
-	out[index] = 1
+		out.append(0.)
+	out[index] = 1.
 	return inp, out
 
-def create_addition():
+def create_binary():
+	inp = []
+	out = [[1., 0.], [0., 1.]]
+	for i in range(0, 2):
+		inp.append(randint(0, 10))
+	if inp[0] == inp[1] :
+		return create_binary()
+	elif inp[0] > inp[1] :
+		pick = 0
+	else: 
+		pick = 1
+	return inp, out[pick]
+
+def create_addition(input_num, output_num):
 	inp = []
 	out = []
 	total = 0
@@ -42,11 +55,69 @@ def create_addition():
 	out[total] = 1
 	return inp, out
 
-layers = [2, 2, 2]
-NN = Neural_Net(layers)
-x, d = create_greatest(layers[0], 0, 10)
+
+
+
+
+
+
+
+
+
+
+layers = [2, 20, 10]
+learning_rate = 0.001
+NN = Neural_Net(layers, learning_rate)
+'''
+x, d = create_addition(layers[0], layers[len(layers)-1])
 print(x)
+p = NN.predict(x)
+c = NN.collapse(p)
+print(c)
+print()
+'''
+
+test_size = 1 #Should be odd
+total_wrong = []
+wrong = []
+for i in range(100000):
+	x, d = create_addition(layers[0], layers[len(layers)-1])
+	c = NN.train(x)
+	if c != d : 
+		total_wrong.append(i)
+		wrong.append(i)
+	if i % test_size == 0 :
+		if len(wrong) <= (test_size // 2):
+			NN.reward(True)
+		else:
+			NN.reward(False)
+		wrong = []
+
+x, d = create_addition(layers[0], layers[len(layers)-1])
+print(x)
+print(d)
 p = NN.predict(x)
 print(p)
 c = NN.collapse(p)
 print(c)
+if c == d :
+	print('CORRECT')
+else:
+	print('WRONG')
+
+'''
+x = [x[1], x[0]]
+d = [d[1], d[0]]
+print(d)
+p = NN.predict(x)
+print(p)
+c = NN.collapse(p)
+print(c)
+if c == d :
+	print('CORRECT')
+else:
+	print('WRONG')
+
+print()
+print(NN)
+'''
