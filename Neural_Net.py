@@ -74,11 +74,8 @@ class Neural_Net(object):
 				temp2.append(0.)
 			W.append(np.array(temp))
 			WP.append(np.array(temp2))
-		B = []
-		BP = []
-		for o in range(output_num):
-			B.append(1.)
-			BP.append(0.)
+		B = 1.
+		BP = 0.
 		return W, WP, B, BP
 	
 	def init_functions(self):
@@ -107,7 +104,7 @@ class Neural_Net(object):
 			w = 'weights_layer_' + str(l)
 			self.weights.append(T.matrix(w))
 			b = 'bias_layer_' + str(l)
-			self.biases.append(T.vector(b))
+			self.biases.append(T.scalar(b))
 		
 		#Build equations
 		self.hiddens.append(T.nnet.sigmoid(T.dot(self.inputs, self.weights[0]) + self.biases[0]))

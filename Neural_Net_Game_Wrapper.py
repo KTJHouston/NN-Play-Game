@@ -45,14 +45,14 @@ def create_addition(input_num, output_num):
 	inp = []
 	out = []
 	total = 0
-	max = output_num // input_num
+	max = (output_num - 1) // input_num
 	for i in range(input_num):
 		r = randint(0, max)
 		inp.append(r)
 		total = total + r
-	for i in range(output_num+1):
+	for i in range(output_num):
 		out.append(0.)
-	out[total] = 1
+	out[total] = 1.
 	return inp, out
 
 
@@ -80,7 +80,7 @@ print()
 test_size = 1 #Should be odd
 total_wrong = []
 wrong = []
-for i in range(100000):
+for i in range(10000):
 	x, d = create_addition(layers[0], layers[len(layers)-1])
 	c = NN.train(x)
 	if c != d : 
@@ -117,7 +117,7 @@ if c == d :
 	print('CORRECT')
 else:
 	print('WRONG')
+'''
 
 print()
 print(NN)
-'''
