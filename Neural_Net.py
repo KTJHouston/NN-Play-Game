@@ -33,11 +33,12 @@ class Neural_Net(object):
 			if r < output[i] :
 				break
 			r = r - output[i]
-		move_made = []
+		choice = []
 		for i in range(len(output)):
-			move_made.append(0.)
-		move_made[out] = 1.
-		return move_made
+			choice.append(0.)
+		choice[out] = 1.
+		confidence = output[out] / total
+		return choice, confidence
 	
 	def generate_all_layers(self):
 		'''
@@ -142,10 +143,10 @@ class Neural_Net(object):
 		changes can be rewarded by calling the 'reward' function.
 		'''
 		p = self.predict(inputs)
-		c = self.collapse(p)
+		c, confidence = self.collapse(p)
 		g = self.gradient(inputs, c)
 		self.update(g)
-		return c
+		return c, confidence
 	
 	def gradient(self, input, desired_output):
 		'''
