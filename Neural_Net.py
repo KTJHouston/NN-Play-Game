@@ -37,7 +37,9 @@ class Neural_Net(object):
 		for i in range(len(output)):
 			choice.append(0.)
 		choice[out] = 1.
-		confidence = output[out] / total
+		confidence = []
+		for i in range(len(output)):
+			confidence.append(output[i] / total)
 		return choice, confidence
 	
 	def generate_all_layers(self):
@@ -172,20 +174,23 @@ class Neural_Net(object):
 			self.BP[b] = self.BP[b] - self.learning_rate * gradient[g]
 			g = g + 1
 	
-	def reward(self, is_positive):
+	def reward(self, is_positive, strength):
 		'''
 		Applies the list of changes to the neural net, either as 
-		positive or negative reinforcement based on the boolean 
-		value given.
+		positive or negative reinforcement at a certain percentage 
+		of strength based on the boolean value given.
 		'''
 		if is_positive:
-			p = 1
+			p = 1 * strength
 		else:
-			p = -1
+			p = -1 * strength
 		for w in range(0, len(self.W)):
 			self.W[w] = self.W[w] + (p * self.WP[w])
 		for b in range(0, len(self.B)):
 			self.B[b] = self.B[b] + (p * self.BP[b])
+		self.reward_clear()
+	
+	def reward_clear(self):
 		for w in range(0, len(self.WP)):
 			self.WP[w] = self.WPblank[w]
 		for b in range(0, len(self.BP)):
