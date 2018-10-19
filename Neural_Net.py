@@ -162,8 +162,9 @@ class Neural_Net(object):
 	
 	def reward(self, strength):
 		'''
-		Applies the list of changes to the neural net, at a certain strength. 
-		+1 is 100% reward. -1 is 100% punishment.
+		Applies the list of changes to the neural net, either as 
+		positive or negative reinforcement at a certain percentage 
+		of strength based on the boolean value given.
 		'''
 		for w in range(0, len(self.W)):
 			self.W[w] = self.W[w] + (strength * self.WP[w])
