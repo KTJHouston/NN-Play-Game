@@ -19,6 +19,17 @@ class Neural_Net(object):
 		self.init_functions()
 		self.generate_all_layers()
 	
+	def __str__(self):
+		'''
+		String representation of the Neural Net. Lists all the weights and biases 
+		that define the Neural Net.
+		'''
+		out = ''
+		for i in range(0, len(self.W)):
+			out = out + str(self.W[i]) + '\n'
+			out = out + str(self.B[i]) + '\n'
+		return out
+	
 	def collapse(self, output):
 		'''
 		Randomly collapse the original output into a single index. The result is 
@@ -81,6 +92,17 @@ class Neural_Net(object):
 		BP = 0.
 		return W, WP, B, BP
 	
+	def gradient(self, input, desired_output):
+		'''
+		Computes the gradient to adjust weights and biases, based on the 
+		input and desired_output given.
+		'''
+		grad_inputs = [input]
+		grad_inputs.extend(self.W)
+		grad_inputs.extend(self.B)
+		grad_inputs.append(desired_output)
+		return self.grad_function(*grad_inputs)
+	
 	def init_functions(self):
 		'''
 		Generates a prediction function and a gradient function.
@@ -138,42 +160,6 @@ class Neural_Net(object):
 		predict_inputs.extend(self.B)
 		return self.predict_function(*predict_inputs)
 	
-	def train(self, inputs):
-		'''
-		Computes a collapsed output with the neural net from the inputes given. 
-		Then, saves the gradient changes based on the collapsed output. These 
-		changes can be rewarded by calling the 'reward' function.
-		'''
-		p = self.predict(inputs)
-		c, confidence = self.collapse(p)
-		g = self.gradient(inputs, c)
-		self.update(g)
-		return c, confidence
-	
-	def gradient(self, input, desired_output):
-		'''
-		Computes the gradient to adjust weights and biases, based on the 
-		input and desired_output given.
-		'''
-		grad_inputs = [input]
-		grad_inputs.extend(self.W)
-		grad_inputs.extend(self.B)
-		grad_inputs.append(desired_output)
-		return self.grad_function(*grad_inputs)
-	
-	def update(self, gradient):
-		'''
-		Saves the gradient to the list of changes to eventually be 
-		applied to the weights and biases of the neural net.
-		'''
-		g = 0
-		for w in range(0, len(self.WP)):
-			self.WP[w] = self.WP[w] - self.learning_rate * gradient[g]
-			g = g + 1
-		for b in range(0, len(self.BP)):
-			self.BP[b] = self.BP[b] - self.learning_rate * gradient[g]
-			g = g + 1
-	
 	def reward(self, is_positive, strength):
 		'''
 		Applies the list of changes to the neural net, either as 
@@ -191,14 +177,36 @@ class Neural_Net(object):
 		self.reward_clear()
 	
 	def reward_clear(self):
+		'''
+		Resets weight and bias gradient that could be applied to 
+		the Neural Net's weights and biases.
+		'''
 		for w in range(0, len(self.WP)):
 			self.WP[w] = self.WPblank[w]
 		for b in range(0, len(self.BP)):
 			self.BP[b] = self.BPblank[b]
 	
-	def __str__(self):
-		out = ''
-		for i in range(0, len(self.W)):
-			out = out + str(self.W[i]) + '\n'
-			out = out + str(self.B[i]) + '\n'
-		return out
+	def train(self, inputs):
+		'''
+		Computes a collapsed output with the neural net from the inputes given. 
+		Then, saves the gradient changes based on the collapsed output. These 
+		changes can be rewarded by calling the 'reward' function.
+		'''
+		p = self.predict(inputs)
+		c, confidence = self.collapse(p)
+		g = self.gradient(inputs, c)
+		self.update(g)
+		return c, confidence
+	
+	def update(self, gradient):
+		'''
+		Saves the gradient to the list of changes to eventually be 
+		applied to the weights and biases of the neural net.
+		'''
+		g = 0
+		for w in range(0, len(self.WP)):
+			self.WP[w] = self.WP[w] - self.learning_rate * gradient[g]
+			g = g + 1
+		for b in range(0, len(self.BP)):
+			self.BP[b] = self.BP[b] - self.learning_rate * gradient[g]
+			g = g + 1
