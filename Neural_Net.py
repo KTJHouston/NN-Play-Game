@@ -160,20 +160,16 @@ class Neural_Net(object):
 		predict_inputs.extend(self.B)
 		return self.predict_function(*predict_inputs)
 	
-	def reward(self, is_positive, strength):
+	def reward(self, strength):
 		'''
 		Applies the list of changes to the neural net, either as 
 		positive or negative reinforcement at a certain percentage 
 		of strength based on the boolean value given.
 		'''
-		if is_positive:
-			p = 1 * strength
-		else:
-			p = -1 * strength
 		for w in range(0, len(self.W)):
-			self.W[w] = self.W[w] + (p * self.WP[w])
+			self.W[w] = self.W[w] + (strength * self.WP[w])
 		for b in range(0, len(self.B)):
-			self.B[b] = self.B[b] + (p * self.BP[b])
+			self.B[b] = self.B[b] + (strength * self.BP[b])
 		self.reward_clear()
 	
 	def reward_clear(self):
