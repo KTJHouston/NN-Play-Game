@@ -182,7 +182,7 @@ class Neural_Net(object):
 		for b in range(0, len(self.BP)):
 			self.BP[b] = self.BPblank[b]
 	
-	def train(self, inputs):
+	def train(self, inputs, desired=0):
 		'''
 		Computes a collapsed output with the neural net from the inputes given. 
 		Then, saves the gradient changes based on the collapsed output. These 
@@ -190,7 +190,12 @@ class Neural_Net(object):
 		'''
 		p = self.predict(inputs)
 		c, confidence = self.collapse(p)
-		g = self.gradient(inputs, c)
+		
+		if desired == 0 :
+			cd = c
+		else:
+			cd = desired
+		g = self.gradient(inputs, cd)
 		self.update(g)
 		return c, confidence
 	
