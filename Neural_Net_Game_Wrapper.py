@@ -55,17 +55,6 @@ def create_addition(input_num, output_num):
 	out[total] = 1.
 	return inp, out
 
-def create_addition_2(output_num):
-	inp = []
-	out = []
-	total = randint(0, output_num-1)
-	for o in range(0, output_num):
-		out.append(0.)
-	out[total] = 1.
-	inp.append(randint(0, total))
-	inp.append(total - inp[0])
-	return inp, out
-
 def create_AND(r):
 	inp = [[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]]
 	out = [[0, 1], [0, 1], [0, 1], [1, 0], [1, 0]]
@@ -82,32 +71,24 @@ def pp(flist):
 
 
 
+	
+	
 
 
 
 
 
-
-
-
-layers = [2, 6, 5]
+layers = [4, 5, 4]
 learning_rate = 0.01
 NN = Neural_Net(layers, learning_rate)
-'''
-x, d = create_addition(layers[0], layers[len(layers)-1])
-print(x)
-p = NN.predict(x)
-c = NN.collapse(p)
-print(c)
-print()
-'''
-
 
 test_size = 1 #Should be odd
 total_wrong = []
 wrong = []
-for i in range(1000000):
-	x, d = create_addition_2(layers[len(layers)-1])
+low = 2
+high = 6
+for i in range(100000):
+	x, d = create_greatest(layers[0], low, high)
 	c, conf = NN.train(x)
 	if c != d : 
 		total_wrong.append(i)
@@ -116,14 +97,14 @@ for i in range(1000000):
 		#if True:
 		#if len(wrong) <= (test_size // 2):
 		if len(wrong) == 0:
-			NN.reward(True, 1.)
+			NN.reward(1.)
 		else:
-			NN.reward(False, .01)
-			#NN.reward_clear()
+			#NN.reward(False, 0.)
+			NN.reward_clear()
 		wrong = []
 
 for i in range(10):
-	x, d = create_addition_2(layers[len(layers)-1])
+	x, d = create_greatest(layers[0], low, high)
 	print(x)
 	#print(d)
 	p = NN.predict(x)
