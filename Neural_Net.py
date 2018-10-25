@@ -6,18 +6,26 @@ import json
 
 class Neural_Net(object):
 	
-	def __init__(self, layers, learning_rate):
+	def __init__(self, layers=None, learning_rate=None, filename=None):
 		'''
 		layers is a list of the number of nodes per layer in the neural net.
 		The first is the number of input nodes. The last is the number of output nodes.
-		The number in between are hidden layers. Minimum of 1 hidden layer.
+		The numbers in between are hidden layers. Minimum of 1 hidden layer. 
+		learning_rate is the percentage of the gradient applied to the weights and biases. 
+		filename is the name of a file to load a neural network from. Both the layers and 
+		learning_rate OR a filename are needed to initialize the function.
 		'''
-		self.layers = layers
-		self.learning_rate = learning_rate
-		
-		self.init_variables()
-		self.init_functions()
-		self.generate_all_layers()
+		if filename == None :
+			if layers == None or learning_rate == None :
+				raise Exception("layers list or learning_rate value not provided")
+			self.layers = layers
+			self.learning_rate = learning_rate
+			
+			self.init_variables()
+			self.init_functions()
+			self.generate_all_layers()
+		else:
+			self.load(filename)
 	
 	def __str__(self):
 		'''
@@ -152,6 +160,9 @@ class Neural_Net(object):
 		self.gradient_equation = T.grad(self.cost_equation, self.adjustables)
 	
 	def load(self, filename):
+		'''
+		Loads layers, learning_rate, weights, and biases from the file given.
+		'''
 		with open(filename, 'r') as read_file:
 			data = json.load(read_file)
 			self.layers = data['layers']
@@ -210,6 +221,9 @@ class Neural_Net(object):
 			self.BP[b] = self.BPblank[b]
 	
 	def save(self, filename):
+		'''
+		Saves layers, learning_rate, weights, and biases to the file given.
+		'''
 		with open(filename, 'w') as write_file:
 			data = {
 				'layers': self.layers,

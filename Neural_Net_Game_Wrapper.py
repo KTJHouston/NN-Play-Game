@@ -77,17 +77,20 @@ def pp(flist):
 
 
 
-
+'''
 layers = [4, 5, 4]
 learning_rate = 0.01
 NN = Neural_Net(layers, learning_rate)
+'''
+NN = Neural_Net(filename='Good_Greatest.json')
+layers = NN.layers
 
 test_size = 1 #Should be odd
 total_wrong = []
 wrong = []
 low = 2
 high = 6
-for i in range(50000):
+for i in range(100):
 	x, d = create_greatest(layers[0], low, high)
 	c, conf = NN.train(x)
 	if c != d : 
@@ -102,6 +105,7 @@ for i in range(50000):
 			NN.reward_clear()
 		wrong = []
 
+'''
 #Save Neural Net:
 filename = 'savenn.json'
 NN.save(filename)
@@ -130,15 +134,16 @@ for i in range(50000):
 		else:
 			NNloaded.reward_clear()
 		wrong = []
+'''
 
 #Show results:
 for i in range(10):
 	x, d = create_greatest(layers[0], low, high)
 	print(x)
 	#print(d)
-	p = NNloaded.predict(x)
+	p = NN.predict(x)
 	print(p)
-	c, confidence = NNloaded.collapse(p)
+	c, confidence = NN.collapse(p)
 	print(c)
 	print(d)
 	print('Confidence:')
