@@ -2,7 +2,7 @@ import theano
 import theano.tensor as T
 from theano import function
 from random import random
-import numpy as np
+import json
 
 class Neural_Net(object):
 	
@@ -38,7 +38,7 @@ class Neural_Net(object):
 		total = 0.
 		for i in output:
 			total = total + i
-		r = np.random.rand() * total
+		r = random() * total
 		for i in range(0, len(output)):
 			out = i
 			if r < output[i] :
@@ -55,7 +55,7 @@ class Neural_Net(object):
 	
 	def generate_all_layers(self):
 		'''
-		Generates all weights and biases based off of layer list.
+		Generates all weight and bias values based off of layer list.
 		'''
 		self.W = []
 		self.WP = []
@@ -74,8 +74,8 @@ class Neural_Net(object):
 	
 	def generate_single_layer(self, input_num, output_num):
 		'''
-		Returns a weight matrix and bias vector corresponding to 
-		the input and output numers.
+		Returns a weight matrix and bias vector of random values corresponding 
+		to the input and output numbers.
 		'''
 		W = []
 		WP = []
@@ -86,8 +86,8 @@ class Neural_Net(object):
 				r = random()
 				temp.append(r*2-1)#possible replacement of 'r'
 				temp2.append(0.)
-			W.append(np.array(temp))
-			WP.append(np.array(temp2))
+			W.append(temp)
+			WP.append(temp2)
 		B = 1.
 		BP = 0.
 		return W, WP, B, BP
