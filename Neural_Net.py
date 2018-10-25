@@ -83,8 +83,8 @@ class Neural_Net(object):
 			temp = []
 			temp2 = []
 			for o in range(output_num):
-				r = random()
-				temp.append(r*2-1)#possible replacement of 'r'
+				r = random() * 2 - 1
+				temp.append(r)
 				temp2.append(0.)
 			W.append(temp)
 			WP.append(temp2)
@@ -150,6 +150,33 @@ class Neural_Net(object):
 		
 		#Define gradient:
 		self.gradient_equation = T.grad(self.cost_equation, self.adjustables)
+	
+	def load(self, filename):
+		with open(filename, 'r') as read_file:
+			data = json.load(read_file)
+			self.layers = data['layers']
+			self.learning_rate = data['learning_rate']
+			
+			self.W = []
+			self.WP = []
+			self.WPblank = []
+			for i in range(0, len(data['weights'])):
+				self.W.append(data['weights'][str(i)])
+				self.WP.append(data['weightsblank'][str(i)])
+				self.WPblank.append(data['weightsblank'][str(i)])
+			
+			self.B = []
+			self.BP = []
+			self.BPblank = []
+			for i in range(0, len(data['biases'])):
+				self.B.append(data['biases'][str(i)])
+				self.BP.append(data['biasesblank'][str(i)])
+				self.BPblank.append(data['biasesblank'][str(i)])
+			
+			read_file.close()
+			
+			self.init_variables()
+			self.init_functions()
 		
 	def predict(self, inputs):
 		'''
@@ -181,6 +208,35 @@ class Neural_Net(object):
 			self.WP[w] = self.WPblank[w]
 		for b in range(0, len(self.BP)):
 			self.BP[b] = self.BPblank[b]
+	
+	def save(self, filename):
+		with open(filename, 'w') as write_file:
+			data = {
+				'layers': self.layers,
+				'learning_rate': self.learning_rate
+			}
+			
+			weights = {}
+			weightsblank = {}
+			for i in range(0, len(self.W)):
+				if isinstance(self.W[i], list):
+					weights[i] = self.W[i]
+				else:
+					weights[i] = self.W[i].tolist()
+				weightsblank[i] = self.WPblank[i]
+			data['weights'] = weights
+			data['weightsblank'] = weightsblank
+			
+			biases = {}
+			biasesblank = {}
+			for i in range(0, len(self.B)):
+				biases[i] = self.B[i]
+				biasesblank[i] = self.BPblank[i]
+			data['biases'] = biases
+			data['biasesblank'] = biasesblank
+			
+			json.dump(data, write_file)
+			write_file.close()
 	
 	def train(self, inputs, desired=0):
 		'''

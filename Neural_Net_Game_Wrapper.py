@@ -87,7 +87,7 @@ total_wrong = []
 wrong = []
 low = 2
 high = 6
-for i in range(100000):
+for i in range(50000):
 	x, d = create_greatest(layers[0], low, high)
 	c, conf = NN.train(x)
 	if c != d : 
@@ -99,17 +99,46 @@ for i in range(100000):
 		if len(wrong) == 0:
 			NN.reward(1.)
 		else:
-			#NN.reward(False, 0.)
 			NN.reward_clear()
 		wrong = []
 
+#Save Neural Net:
+filename = 'savenn.json'
+NN.save(filename)
+NNloaded = Neural_Net(layers, 1)
+NNloaded.load(filename)
+print(NN)
+print()
+print(NNloaded)
+print()
+
+#Continue Training:
+for i in range(50000):
+	x, d = create_greatest(layers[0], low, high)
+	c, conf = NNloaded.train(x)
+	if c != d : 
+		total_wrong.append(i)
+		wrong.append(i)
+		print('wrong')
+	else:
+		print('right')
+	if i % test_size == 0 :
+		#if True:
+		#if len(wrong) <= (test_size // 2):
+		if len(wrong) == 0:
+			NNloaded.reward(1.)
+		else:
+			NNloaded.reward_clear()
+		wrong = []
+
+#Show results:
 for i in range(10):
 	x, d = create_greatest(layers[0], low, high)
 	print(x)
 	#print(d)
-	p = NN.predict(x)
+	p = NNloaded.predict(x)
 	print(p)
-	c, confidence = NN.collapse(p)
+	c, confidence = NNloaded.collapse(p)
 	print(c)
 	print(d)
 	print('Confidence:')
@@ -119,20 +148,3 @@ for i in range(10):
 	else:
 		print('WRONG')
 	print()
-
-'''
-x = [x[1], x[0]]
-d = [d[1], d[0]]
-print(d)
-p = NN.predict(x)
-print(p)
-c = NN.collapse(p)
-print(c)
-if c == d :
-	print('CORRECT')
-else:
-	print('WRONG')
-
-print()
-print(NN)
-'''
