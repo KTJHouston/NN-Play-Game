@@ -16,6 +16,7 @@ class Game(object):
 		self.marker = None
 		self.goal = None
 		self.obstacles = []
+		self.SetBasic()
 					
 	def GetPathAsVector(self):
 		output = []
@@ -89,7 +90,7 @@ class Game(object):
 			self.SetPath(np, Game.M)
 			self.marker = np
 			
-	def HasWon(self):
+	def has_won(self):
 		if self.marker == self.goal:
 			return True
 		return False
