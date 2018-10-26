@@ -112,6 +112,7 @@ mw.test(5, 15)
 nn = Neural_Net(filename='Final.json')
 mw = Neural_Net_Maze_Wrapper(nn)
 mw.run(15, True)
+mw.nn.save('Saved_Neural_Nets/Maze_Solvers/Final.json')
 '''
 #Further train more constrained neural net:
 nn = Neural_Net(filename='Second.json')
