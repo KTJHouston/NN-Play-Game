@@ -2,30 +2,26 @@ from Neural_Net import Neural_Net
 from random import random, randint
 
 #Create test cases:
-def create_greatest(input_num, low, high):
+def create_greatest(input_num):
 	'''
-	Creates a list of length size of random integers, 
-	and another list of length size with a 1 in the index
+	Creates an input list of length input_num of integers 1 through input_num, 
+	randomly ordered. The output list is the same length with a 1 at the index
 	corresponding to the index of the largest number in the first list.
 	'''
+	list = []
 	inp = []
 	out = []
-	index = -1
-	largest = -1
-	for i in range(0, input_num):
-		r = randint(low, high)
-		if r > largest :
-			inp.append(r)
-			largest = r
-			index = i
-		elif r == largest :
-			inp.append(r+1)
-			largest = r+1
-			index = i
+	for i in range(1, input_num+1):
+		list.append(i)
+	for i in range(0, len(list)):
+		r = randint(0, len(list)-1)
+		val = list[r]
+		inp.append(val)
+		if val == input_num :
+			out.append(1.)
 		else:
-			inp.append(r)
-		out.append(0.)
-	out[index] = 1.
+			out.append(0.)
+		del list[r]
 	return inp, out
 
 def create_binary():
@@ -78,20 +74,20 @@ def pp(flist):
 
 
 '''
-layers = [4, 5, 4]
+layers = [4, 6, 4]
 learning_rate = 0.01
 NN = Neural_Net(layers, learning_rate)
 '''
-NN = Neural_Net(filename='Good_Greatest.json')
+filename = 'Good_Greatest.json'
+NN = Neural_Net(filename=filename)
 layers = NN.layers
+NN.learning_rate = .001
 
 test_size = 1 #Should be odd
 total_wrong = []
 wrong = []
-low = 2
-high = 6
-for i in range(100):
-	x, d = create_greatest(layers[0], low, high)
+for i in range(500000):
+	x, d = create_greatest(layers[0])
 	c, conf = NN.train(x)
 	if c != d : 
 		total_wrong.append(i)
@@ -102,43 +98,13 @@ for i in range(100):
 		if len(wrong) == 0:
 			NN.reward(1.)
 		else:
-			NN.reward_clear()
+			NN.reward(-.25)
+			#NN.reward_clear()
 		wrong = []
-
-'''
-#Save Neural Net:
-filename = 'savenn.json'
-NN.save(filename)
-NNloaded = Neural_Net(layers, 1)
-NNloaded.load(filename)
-print(NN)
-print()
-print(NNloaded)
-print()
-
-#Continue Training:
-for i in range(50000):
-	x, d = create_greatest(layers[0], low, high)
-	c, conf = NNloaded.train(x)
-	if c != d : 
-		total_wrong.append(i)
-		wrong.append(i)
-		print('wrong')
-	else:
-		print('right')
-	if i % test_size == 0 :
-		#if True:
-		#if len(wrong) <= (test_size // 2):
-		if len(wrong) == 0:
-			NNloaded.reward(1.)
-		else:
-			NNloaded.reward_clear()
-		wrong = []
-'''
 
 #Show results:
 for i in range(10):
-	x, d = create_greatest(layers[0], low, high)
+	x, d = create_greatest(layers[0])
 	print(x)
 	#print(d)
 	p = NN.predict(x)
@@ -153,3 +119,6 @@ for i in range(10):
 	else:
 		print('WRONG')
 	print()
+
+#Save further trained net:
+NN.save(filename)
