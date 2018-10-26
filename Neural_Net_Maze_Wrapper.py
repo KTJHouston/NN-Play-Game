@@ -15,7 +15,7 @@ class Neural_Net_Maze_Wrapper(object):
 		self.nn = nn
 		self.maze = Maze()
 	
-	def run_once(self):
+	def move_once(self):
 		'''
 		Calculates next move through the neural net 
 		once, and applies that move. Returns True if 
@@ -50,7 +50,7 @@ class Neural_Net_Maze_Wrapper(object):
 		has won.
 		'''
 		for i in range(max_moves):
-			hw, conf = self.run_once()
+			hw, conf = self.move_once()
 			if verbose:
 				self.pp(conf)
 				print(f'%d:' % i)
@@ -89,34 +89,46 @@ class Neural_Net_Maze_Wrapper(object):
 		self.nn.reward_clear()
 	
 	def pp(self, flist):
+		'''
+		Prints a list of floats, but restricts the number 
+		of decimal places to 2.
+		'''
 		print('[', end='')
 		for f in range(len(flist)-1):
 			print(f'%.2f, ' % flist[f], end='')
 		print(f'%.2f]' % flist[len(flist)-1])
+	
+def demo_file(filename, max_moves):
+	'''
+	Reads in a neural network from the file given, 
+	then runs it through the maze once with the 
+	verbose setting. 
+	'''
+	nn = Neural_Net(filename=filename)
+	mw = Neural_Net_Maze_Wrapper(nn)
+	mw.run(max_moves, True)
 
-'''
-#Train a neural net:
-layers = [9, 6, 4]
-learning_rate = 0.01
-nn = Neural_Net(layers, learning_rate)
-mw = Neural_Net_Maze_Wrapper(nn)
-mw.train(10000, 15)
-mw.nn.save('First.json')
+def demo_new(layers, learning_rate, filename, max_moves=0):
+	'''
+	Randomly generates a new neural net, demos 
+	it, then saves it to the filename given.
+	'''
+	nn = Neural_Net(layers, learning_rate)
+	mw = Neural_Net_Maze_Wrapper(nn)
+	if max_moves > 0 :
+		mw.run(max_moves, True)
+	mw.nn.save(filename)
 
-#Test the neural net:
-nn = Neural_Net(filename='First.json')
-mw = Neural_Net_Maze_Wrapper(nn)
-mw.test(5, 15)
-'''
-#Test the neural net verbose:
-nn = Neural_Net(filename='Final.json')
-mw = Neural_Net_Maze_Wrapper(nn)
-mw.run(15, True)
-mw.nn.save('Saved_Neural_Nets/Maze_Solvers/Final.json')
-'''
-#Further train more constrained neural net:
-nn = Neural_Net(filename='Second.json')
-mw = Neural_Net_Maze_Wrapper(nn)
-mw.train(1000, 4)
-mw.nn.save('Final.json')
-'''
+def train_file(filename, iterations, max_moves, savefile=None):
+	'''
+	Reads in a neural network from the file given.
+	Then, trains the data based on the number of iterations.
+	Saves the file to either another name, if given, 
+	or overwriting the original file.
+	'''
+	nn = Neural_Net(filename=filename)
+	mw = Neural_Net_Maze_Wrapper(nn)
+	mw.train(iterations, max_moves)
+	if savefile == None :
+		savefile = filename
+	mw.nn.save(savefile)
