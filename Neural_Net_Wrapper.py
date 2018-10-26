@@ -64,11 +64,38 @@ def pp(flist):
 		print(f'%.2f, ' % flist[f], end='')
 	print(f'%.2f]' % flist[len(flist)-1])
 
+def train(nn, iterations, training_function, group_size=1):
+	wrong = []
+	for i in range(iterations):
+		x, d = training_function(nn.layers[0])
+		c, conf = nn.train(x)
+		if c != d :
+			wrong.append(i)
+		if i % group_size == 0 :
+			if len(wrong) <= (group_size // 2):
+				nn.reward(1.)
+			else:
+				nn.reward(-.25)
+			wrong = []
+	nn.reward_clear()
+	return nn
 
-
-
-	
-	
+def test(nn, iterations, training_function):
+	for i in range(iterations):
+		x, d = training_function(nn.layers[0])
+		print(x)
+		p = nn.predict(x)
+		#print(p)
+		c, confidence = nn.collapse(p)
+		print(c)
+		print(d)
+		print('Confidence:')
+		pp(confidence)
+		if c == d :
+			print('CORRECT')
+		else:
+			print('WRONG')
+		print()
 
 
 
@@ -77,6 +104,7 @@ def pp(flist):
 layers = [4, 6, 4]
 learning_rate = 0.01
 NN = Neural_Net(layers, learning_rate)
+'''
 '''
 filename = 'Good_Greatest.json'
 NN = Neural_Net(filename=filename)
@@ -122,3 +150,4 @@ for i in range(10):
 
 #Save further trained net:
 NN.save(filename)
+'''
