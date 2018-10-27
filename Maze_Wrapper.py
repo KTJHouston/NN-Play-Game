@@ -1,5 +1,5 @@
 from Neural_Net import Neural_Net
-from Maze import Game as Maze
+from Maze import Maze
 
 class Neural_Net_Maze_Wrapper(object):
 	
@@ -14,6 +14,7 @@ class Neural_Net_Maze_Wrapper(object):
 			raise Exception("Given neural net must start with 9 nodes and end with 4.")
 		self.nn = nn
 		self.maze = Maze()
+		self.maze.generate_random()
 	
 	def move_once(self):
 		'''
@@ -21,7 +22,7 @@ class Neural_Net_Maze_Wrapper(object):
 		once, and applies that move. Returns True if 
 		destination reached. False, otherwise.
 		'''
-		input = self.maze.GetPathAsVector()
+		input = self.maze.get_map_as_vector()
 		output, conf = self.nn.train(input)
 		self.apply_move(output)
 		return self.maze.has_won(), conf
@@ -49,16 +50,18 @@ class Neural_Net_Maze_Wrapper(object):
 		moves up to max_moves, returning True if it 
 		has won.
 		'''
+		print(self.maze)
+		print()
 		for i in range(max_moves):
 			hw, conf = self.move_once()
 			if verbose:
-				self.pp(conf)
 				print(f'%d:' % i)
+				self.pp(conf)
 				print(self.maze)
 				print()
 			if hw:
 				break
-		self.maze = Maze()
+		self.maze.generate_random()
 		if hw:
 			return True, i
 		return False, -1
