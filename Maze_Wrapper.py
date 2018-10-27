@@ -1,7 +1,7 @@
 from Neural_Net import Neural_Net
 from Maze import Maze
 
-class Neural_Net_Maze_Wrapper(object):
+class Maze_Wrapper(object):
 	
 	def __init__(self, nn):
 		'''
@@ -50,8 +50,9 @@ class Neural_Net_Maze_Wrapper(object):
 		moves up to max_moves, returning True if it 
 		has won.
 		'''
-		print(self.maze)
-		print()
+		if verbose:
+			print(self.maze)
+			print()
 		for i in range(max_moves):
 			hw, conf = self.move_once()
 			if verbose:
@@ -108,7 +109,7 @@ def demo_file(filename, max_moves):
 	verbose setting. 
 	'''
 	nn = Neural_Net(filename=filename)
-	mw = Neural_Net_Maze_Wrapper(nn)
+	mw = Maze_Wrapper(nn)
 	mw.run(max_moves, True)
 
 def demo_new(layers, learning_rate, filename, max_moves=0):
@@ -117,7 +118,7 @@ def demo_new(layers, learning_rate, filename, max_moves=0):
 	it, then saves it to the filename given.
 	'''
 	nn = Neural_Net(layers, learning_rate)
-	mw = Neural_Net_Maze_Wrapper(nn)
+	mw = Maze_Wrapper(nn)
 	if max_moves > 0 :
 		mw.run(max_moves, True)
 	mw.nn.save(filename)
@@ -130,7 +131,7 @@ def train_file(filename, iterations, max_moves, savefile=None):
 	or overwriting the original file.
 	'''
 	nn = Neural_Net(filename=filename)
-	mw = Neural_Net_Maze_Wrapper(nn)
+	mw = Maze_Wrapper(nn)
 	mw.train(iterations, max_moves)
 	if savefile == None :
 		savefile = filename
