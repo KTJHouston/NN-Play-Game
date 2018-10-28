@@ -73,24 +73,30 @@ class Maze_Wrapper(object):
 		of times, limiting the runs the max_moves number 
 		of moves.
 		'''
+		correct = 0
 		for i in range(iterations):
 			hw = self.run(max_moves)
 			if hw[0]:
 				self.nn.reward(1.)
+				correct = correct + 1
 			else:
 				self.nn.reward(-.25)
+		return correct / iterations
 	
 	def test(self, iterations, max_moves):
 		'''
 		Runs the neural net on the maze iterations number 
-		of times, but does not reward the function based 
-		on the output.
+		of times, calculating a percentage of how often 
+		the neural net wins. But, does not reward based on
+		the wins.
 		'''
+		correct = 0
 		for i in range(iterations):
 			hw = self.run(max_moves)
-			print(hw)
-			print()
+			if hw[0]:
+				correct = correct + 1
 		self.nn.reward_clear()
+		return correct / iterations
 	
 	def pp(self, flist):
 		'''
@@ -104,7 +110,7 @@ class Maze_Wrapper(object):
 	
 def demo_file(filename, max_moves):
 	'''
-	Reads in a neural network from the file given, 
+	Reads in a neural net from the file given, 
 	then runs it through the maze once with the 
 	verbose setting. 
 	'''
@@ -125,14 +131,46 @@ def demo_new(layers, learning_rate, filename, max_moves=0):
 
 def train_file(filename, iterations, max_moves, savefile=None):
 	'''
-	Reads in a neural network from the file given.
+	Reads in a neural net from the file given.
 	Then, trains the data based on the number of iterations.
 	Saves the file to either another name, if given, 
 	or overwriting the original file.
 	'''
 	nn = Neural_Net(filename=filename)
 	mw = Maze_Wrapper(nn)
-	mw.train(iterations, max_moves)
+	percent_correct = mw.train(iterations, max_moves)
+	print(f'%.2f correct' % percent_correct)
+	if savefile == None :
+		savefile = filename
+	mw.nn.save(savefile)
+
+def test_file(filename, iterations, max_moves):
+	'''
+	Reads in a neural net from the file given. Then, 
+	Runs the neural net on random mazes iterations 
+	number of times, calculating a percentage for how 
+	often the neural net wins.
+	'''
+	nn = Neural_Net(filename=filename)
+	mw = Maze_Wrapper(nn)
+	percent_correct = mw.test(iterations, max_moves)
+	print(f'%.2f correct' % percent_correct)
+
+def extensive_train(filename, iterations, max, min, savefile=None):
+	'''
+	Reads in a neural net from the file given. Then, 
+	trains the net iterations number of times with max 
+	number of max moves. Then steps down, training again 
+	iterations number of times. Process continues through 
+	min number of max_moves has been trained. The neural 
+	net is then saved at the original file location or 
+	at savefile if provided.
+	'''
+	nn = Neural_Net(filename=filename)
+	mw = Maze_Wrapper(nn)
+	for r in range(max, min-1, -1):
+		percent_correct = mw.train(iterations, r)
+		print(f'%d: %.2f correct' % (r, percent_correct))
 	if savefile == None :
 		savefile = filename
 	mw.nn.save(savefile)
