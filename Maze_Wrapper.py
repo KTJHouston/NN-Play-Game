@@ -174,3 +174,20 @@ def extensive_train(filename, iterations, max, min, savefile=None):
 	if savefile == None :
 		savefile = filename
 	mw.nn.save(savefile)
+
+def full_train(filename, epochs, iterations, max, min, logfile=None):
+	nn = Neural_Net(filename=filename)
+	mw = Maze_Wrapper(nn)
+	log = ''
+	for e in range(epochs):
+		for r in range(max-e, min-1, -1):
+			percent_correct = mw.train(iterations, r)
+			form = f'%d.%d: %.2f correct' % (e, r, percent_correct)
+			print(form)
+			log = log + form + '\n'
+		print()
+		log = log + '\n'
+	mw.nn.save(filename)
+	with open(logfile, 'w') as write_file:
+			write_file.write(log)
+			write_file.close()
