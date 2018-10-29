@@ -108,6 +108,9 @@ class Maze_Wrapper(object):
 			print(f'%.2f, ' % flist[f], end='')
 		print(f'%.2f]' % flist[len(flist)-1])
 	
+	def print_NN(self):
+		print(nn)
+	
 def demo_file(filename, max_moves):
 	'''
 	Reads in a neural net from the file given, 
@@ -180,7 +183,7 @@ def full_train(filename, epochs, iterations, max, min, logfile=None):
 	mw = Maze_Wrapper(nn)
 	log = ''
 	for e in range(epochs):
-		for r in range(max-e, min-1, -1):
+		for r in range(max, min-1, -1):
 			percent_correct = mw.train(iterations, r)
 			form = f'%d.%d: %.2f correct' % (e, r, percent_correct)
 			print(form)
