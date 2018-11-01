@@ -1,4 +1,4 @@
-import Point
+from Point import Point
 from random import randint
 
 class Maze(object):
@@ -216,31 +216,3 @@ class Maze(object):
 			self.set_tile(p, Maze.FREE)
 			self.set_tile(np, Maze.MARKER)
 			self.marker = np
-		
-class Point:
-	def __init__(self, row, col):
-		self.r = row
-		self.c = col
-		
-	def __eq__(self, other):
-		if self.r == other.r and self.c == other.c:
-			return True
-		return False
-
-'''
-x = Maze()
-x.generate_basic()
-print(x)
-print()
-x.left()
-x.down()
-x.up()
-x.down()
-x.down()
-print(x)
-print(x.has_won())
-print()
-x.right()
-print(x)
-print(x.has_won())
-'''
