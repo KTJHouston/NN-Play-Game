@@ -5,10 +5,12 @@ class Maze_Wrapper(object):
 	
 	def __init__(self, nn):
 		'''
-		Takes a neural net as to run the maze with. 
-		The layers of the neural net must begin with 
-		9 and end with 4.
+		Takes a neural net or neural net file as input 
+		to run the maze with. The layers of the neural 
+		net must begin with 9 and end with 4.
 		'''
+		if isinstance(nn, str):
+			nn = Neural_Net(filename=nn)
 		la = nn.layers
 		if la[0] != 9 or la[len(la)-1] != 4 :
 			raise Exception("Given neural net must start with 9 nodes and end with 4.")
@@ -109,17 +111,17 @@ class Maze_Wrapper(object):
 		print(f'%.2f]' % flist[len(flist)-1])
 	
 	def print_NN(self):
-		print(nn)
+		'''
+		Prints the weights and bases in the neural net.
+		'''
+		print(self.nn)
 	
-def demo_file(filename, max_moves):
-	'''
-	Reads in a neural net from the file given, 
-	then runs it through the maze once with the 
-	verbose setting. 
-	'''
-	nn = Neural_Net(filename=filename)
-	mw = Maze_Wrapper(nn)
-	mw.run(max_moves, True)
+	def demo(self, max_moves):
+		'''
+		Runs the neural net through the maze once with the 
+		verbose setting. 
+		'''
+		self.run(max_moves, True)
 
 def demo_new(layers, learning_rate, filename, max_moves=0):
 	'''
