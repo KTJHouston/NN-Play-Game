@@ -28,7 +28,18 @@ class Tic_Tac_Toe(object):
                 output = output + t + ' '
             output = output + ']\n'
         return output
-        
+    
+    def as_vector(self, perspective):
+        '''
+        Returns the board as a 1D vector, multiplied by the perspective, 
+        which should be either 1 or -1.
+        '''
+        output = []
+        for r in self.board:
+            for c in r:
+                output.append(c * perspective)
+        return output
+    
     def clear(self):
         '''
         Sets the board to all blank values.
@@ -39,13 +50,7 @@ class Tic_Tac_Toe(object):
                       [B, B, B],
                       [B, B, B]
                      ]
-            
-    def get(self, point):
-        '''
-        Returns the value at that point on the board, 
-        without any safety checks.
-        '''
-        return self.board[point.r][point.c]
+        self.place_counter = 0
     
     def has_won(self):
         '''
@@ -80,18 +85,44 @@ class Tic_Tac_Toe(object):
             return O
         return self.B
     
-    def is_clear(self, point):
+    def is_full(self):
+        if self.place_counter == 9 :
+            return True
+        return False
+    
+    def placeX(self, point):
+        '''
+        Places an X value at the point on the board. 
+        Returns True if successful, False otherwise.
+        '''
+        return self._place(self.X, point)
+    
+    def placeO(self, point):
+        '''
+        Places an O value at the point on the board. 
+        Returns True if successful, False otherwise.
+        '''
+        return self._place(self.O, point)
+            
+    def _get(self, point):
+        '''
+        Returns the value at that point on the board, 
+        without any safety checks.
+        '''
+        return self.board[point.r][point.c]
+    
+    def _is_clear(self, point):
         '''
         Returns True if the point is within the bounds 
         of the board and the point has a 
         value of B or 0.
         '''
-        if self.is_in_bounds(point):
-            if self.get(point) == self.B :
+        if self._is_in_bounds(point):
+            if self._get(point) == self.B :
                 return True
         return False
     
-    def is_in_bounds(self, point):
+    def _is_in_bounds(self, point):
         '''
         Returns True if the point is within the bounds 
         of the board. 
@@ -101,28 +132,17 @@ class Tic_Tac_Toe(object):
                 return True
         return False
     
-    def place(self, value, point):
+    def _place(self, value, point):
         '''
         Places the value at the point on the board.
         '''
-        if self.is_clear(point):
-            self.set(value, point)
+        if self._is_clear(point):
+            self._set(value, point)
+            self.place_counter = self.place_counter + 1
             return True
         return False
     
-    def placeX(self, point):
-        '''
-        Places an X value at the point on the board.
-        '''
-        self.place(self.X, point)
-    
-    def placeO(self, point):
-        '''
-        Places an O value at the point on the board.
-        '''
-        self.place(self.O, point)
-    
-    def set(self, value, point):
+    def _set(self, value, point):
         '''
         Sets the value at that point on the board, 
         without any safety checks.
