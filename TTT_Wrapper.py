@@ -25,29 +25,25 @@ class TTT_Wrapper(object):
         self.board = TTT()
         self.turn = self.board.X
     
-    def demo(self, max_chances):
+    def demo(self):
         '''
-        Runs the neural nets through a game once with the 
-        verbose setting. 
+        Runs the neural nets through a game once with the verbose setting. 
         '''
-        self.run(max_chances, True)
+        self.run(True)
         self.nnX.reward(0.)
         self.nnO.reward(0.)
 	
-    def run(self, max_chances=1, verbose=False):
+    def run(self, verbose=False):
         '''
-        Runs through a game of tic tac toe. max_chances 
-        allows the neural net to have multiple 
-        chances to make a valid move before having its 
-        turn skipped. Returns True if it has won. 
-        False otherwise.
+        Runs through a game of tic tac toe. Returns 1 if 
+        nnX has won, -1 if nnO has won, and 0 otherwise.
         '''
         if verbose:
             print(self.board)
             print()
         hw = False
         while not self.board.is_full() and not hw:
-            hw, conf = self._move_once(max_chances)
+            hw, conf = self._move_once()
             if verbose:
                 self.pp(conf)
                 print(self.board)
@@ -66,16 +62,14 @@ class TTT_Wrapper(object):
         self.board.clear()
         return winner
     
-    def train(self, iterations, max_chances):
+    def train(self, iterations):
         '''
         Runs the neural net on the board iterations number 
-        of times, limiting the neural nets to max_chances 
-        number of attempts to make a valid move. Returns 
-        the percentage of [O_wins, draws, X_wins].
+        of times. Returns the percentage of [O_wins, draws, X_wins].
         '''
         wins = [0, 0, 0] #[O_wins, draws, X_wins]
         for i in range(iterations):
-            w = self.run(max_chances)
+            w = self.run()
             wins[w+1] = wins[w+1] + 1
             if w == self.board.X :
                 self.nnX.reward(1.)
@@ -90,7 +84,7 @@ class TTT_Wrapper(object):
             wins[i] = wins[i] / iterations
         return wins
     
-    def test(self, iterations, max_chances):
+    def test(self, iterations):
         '''
         Runs the neural net on the board iterations number 
         of times, calculating a percentage of how often 
@@ -99,7 +93,7 @@ class TTT_Wrapper(object):
         '''
         wins = [0, 0, 0] #[O_wins, draws, X_wins]
         for i in range(iterations):
-            w = self.run(max_chances)
+            w = self.run()
             wins[w+1] = wins[w+1] + 1
             self.nnX.reward(0.)
             self.nnO.reward(0.)
@@ -152,36 +146,26 @@ class TTT_Wrapper(object):
         else:
             return self.board.placeO(point)
 	
-    def _move_once(self, max_chances=1):
+    def _move_once(self):
         '''
-        Calculates the next move through the neural net 
-        whose turn it is, then applies that move. 
-        max_chances allows the neural net to have multiple 
-        chances to make a valid move before having its 
-        turn skipped. Returns True if that player 
-        has won. False, otherwise. Also, returns the 
-        confidence level of the move.
+        Calculates the next move with the neural net whose turn it is, 
+        then applies that move. Returns True if the player that last 
+        moved won. False, otherwise. Also, returns the confidence level 
+        of the previous move.
         '''
-        max_chances = max_chances - 1
         input = self.board.as_vector(self.turn)
         valid = self.board.get_valid_vector()
         if self.turn == self.board.X :
             output, conf = self.nnX.train_valid(input, valid)
-            #output, conf = self.nnX.train_valid(input, valid, 0.1)
-            #output, conf = self.nnX.train(input)
         else:
             output, conf = self.nnO.train_valid(input, valid)
-            #output, conf = self.nnO.train_valid(input, valid, 0.1)
-            #output, conf = self.nnO.train(input)
-        is_valid = self._apply_move(output)
-        if not is_valid and max_chances > 0:
-            return self._move_once(max_chances)
+        self._apply_move(output)
         if self.board.has_won() != self.board.B :
             return True, conf
         self._alternate_turn()
         return False, conf
     
-def demo_new(layersX, learning_rateX, filenameX, layersO, learning_rateO, filenameO, max_chances=1):
+def demo_new(layersX, learning_rateX, filenameX, layersO, learning_rateO, filenameO):
     '''
     Plays a game of tic tac toe with two, newly 
     created neural nets, then saves the neural nets 
@@ -190,12 +174,11 @@ def demo_new(layersX, learning_rateX, filenameX, layersO, learning_rateO, filena
     nnX = Neural_Net(layersX, learning_rateX)
     nnO = Neural_Net(layersO, learning_rateO)
     tttw = TTT_Wrapper(nnX, nnO)
-    if max_chances > 0 :
-        tttw.demo(max_chances)
+    tttw.demo()
     tttw.nnX.save(filenameX)
     tttw.nnO.save(filenameO)
 
-def demo(filenameX, filenameO, max_chances=1):
+def demo(filenameX, filenameO):
     '''
     Runs the given neural nets through a game 
     with the verbose flag on.
@@ -203,9 +186,9 @@ def demo(filenameX, filenameO, max_chances=1):
     nnX = Neural_Net(filename=filenameX)
     nnO = Neural_Net(filename=filenameO)
     tttw = TTT_Wrapper(nnX, nnO)
-    tttw.demo(max_chances)
+    tttw.demo()
     
-def train_file(filenameX, filenameO, iterations, max_chances=1):
+def train_file(filenameX, filenameO, iterations):
     '''
     Reads in neural nets from the files given.
     Then, trains the neural nets on games played 
@@ -215,12 +198,12 @@ def train_file(filenameX, filenameO, iterations, max_chances=1):
     nnX = Neural_Net(filename=filenameX)
     nnO = Neural_Net(filename=filenameO)
     tttw = TTT_Wrapper(nnX, nnO)
-    percent_correct = tttw.train(iterations, max_chances)
+    percent_correct = tttw.train(iterations)
     tttw.pp(percent_correct)
     tttw.nnX.save(filenameX)
     tttw.nnO.save(filenameO)
 
-def test_file(filenameX, filenameO, iterations, max_chances=1):
+def test_file(filenameX, filenameO, iterations):
     '''
     Reads in two neural nets from the files given. Then, 
     Runs the neural nets on random boards iterations 
@@ -230,7 +213,7 @@ def test_file(filenameX, filenameO, iterations, max_chances=1):
     nnX = Neural_Net(filename=filenameX)
     nnO = Neural_Net(filename=filenameO)
     tttw = TTT_Wrapper(nnX, nnO)
-    percent_correct = tttw.test(iterations, max_chances)
+    percent_correct = tttw.test(iterations)
     tttw.pp(percent_correct)
 
 fileX = 'Saved_Neural_Nets/TTT/X2.json'
