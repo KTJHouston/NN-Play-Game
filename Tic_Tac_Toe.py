@@ -51,6 +51,21 @@ class Tic_Tac_Toe(object):
                       [B, B, B]
                      ]
         self.place_counter = 0
+	
+    def get_valid_vector(self):
+        '''
+        Returns a vector of length 9 with a 1 in any position 
+        currently open, and a 0 in any position already taken.
+        '''
+        pos = 0
+        valid = []
+        for r in self.board:
+            for c in r:
+                if c == self.B :
+                    valid.append(1.)
+                else:
+                    valid.append(0.)
+        return valid
     
     def has_won(self):
         '''

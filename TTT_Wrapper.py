@@ -24,6 +24,15 @@ class TTT_Wrapper(object):
 
         self.board = TTT()
         self.turn = self.board.X
+    
+    def demo(self, max_chances):
+        '''
+        Runs the neural nets through a game once with the 
+        verbose setting. 
+        '''
+        self.run(max_chances, True)
+        self.nnX.reward(0.)
+        self.nnO.reward(0.)
 	
     def run(self, max_chances=1, verbose=False):
         '''
@@ -70,10 +79,10 @@ class TTT_Wrapper(object):
             wins[w+1] = wins[w+1] + 1
             if w == self.board.X :
                 self.nnX.reward(1.)
-                self.nnO.reward(-.05)
+                self.nnO.reward(-.1)
             elif w == self.board.O :
                 self.nnO.reward(1.)
-                self.nnX.reward(-.05)
+                self.nnX.reward(-.1)
             else:
                 self.nnO.reward(-.05)
                 self.nnX.reward(-.05)
@@ -113,15 +122,6 @@ class TTT_Wrapper(object):
         Prints the weights and bases in the neural net.
         '''
         print(self.nn)
-    
-    def demo(self, max_chances):
-        '''
-        Runs the neural nets through a game once with the 
-        verbose setting. 
-        '''
-        self.run(max_chances, True)
-        self.nnX.reward(0.)
-        self.nnO.reward(0.)
     
     def _alternate_turn(self):
         '''
@@ -164,10 +164,15 @@ class TTT_Wrapper(object):
         '''
         max_chances = max_chances - 1
         input = self.board.as_vector(self.turn)
+        valid = self.board.get_valid_vector()
         if self.turn == self.board.X :
-            output, conf = self.nnX.train(input)
+            output, conf = self.nnX.train_valid(input, valid)
+            #output, conf = self.nnX.train_valid(input, valid, 0.1)
+            #output, conf = self.nnX.train(input)
         else:
-            output, conf = self.nnO.train(input)
+            output, conf = self.nnO.train_valid(input, valid)
+            #output, conf = self.nnO.train_valid(input, valid, 0.1)
+            #output, conf = self.nnO.train(input)
         is_valid = self._apply_move(output)
         if not is_valid and max_chances > 0:
             return self._move_once(max_chances)
@@ -228,9 +233,9 @@ def test_file(filenameX, filenameO, iterations, max_chances=1):
     percent_correct = tttw.test(iterations, max_chances)
     tttw.pp(percent_correct)
 
-fileX = 'Saved_Neural_Nets/TTT/X1.json'
-fileO = 'Saved_Neural_Nets/TTT/O1.json'
-#demo_new([9, 9, 9], 0.01, fileX, [9, 11, 9], 0.01, fileO)
-#train_file(fileX, fileO, 100000)
-test_file(fileX, fileO, 10000)
+fileX = 'Saved_Neural_Nets/TTT/X2.json'
+fileO = 'Saved_Neural_Nets/TTT/O2.json'
+#demo_new([9, 11, 9], 0.01, fileX, [9, 11, 9], 0.01, fileO)
+#train_file(fileX, fileO, 10000)
+test_file(fileX, fileO, 1000)
 demo(fileX, fileO)
