@@ -53,7 +53,24 @@ class Neural_Net(object):
                 largest = output[o]
                 index = o
             choice.append(0.)
-        choice[o] = 1.
+        choice[index] = 1.
+        return choice, choice
+    
+    def collapse_best_valid(self, output, valid):
+        '''
+        Collapses the original output into a single index based 
+        on the highest node. The result is an vector of the same 
+        length filled with all 0's and a single 1.
+        '''
+        largest = 0
+        index = -1
+        choice = []
+        for o in range(len(output)):
+            if output[o] > largest and valid[o] == 1:
+                largest = output[o]
+                index = o
+            choice.append(0.)
+        choice[index] = 1.
         return choice, choice
     
     def collapse_random(self, output):
@@ -83,7 +100,7 @@ class Neural_Net(object):
         '''
         Randomly collapse the original output into a single index. The result is 
         a vector of the same length filled with all 0's and a single 1. But, the 
-        collpase only takes into account valid indices.
+        collapse only takes into account valid indices.
         '''
         total = 0.
         for i in range(len(output)):
@@ -363,38 +380,20 @@ class Neural_Net(object):
         self.update(g)
         return c, confidence
     
-    def train_valid(self, inputs, valid):
+    def train_valid(self, inputs, valid, type):
         '''
         Computes a collapsed output with the neural net from the inputes given. 
         Then, saves the gradient changes based on the collapsed output. These 
-        changes can be rewarded by calling the 'reward' function.
+        changes can be rewarded by calling the 'reward' function. 
+        Type 1 = collapse best, 2 = collapse random. 
         '''
         p = self.predict(inputs)
-        c, confidence = self.collapse_random_valid(p, valid)
+        if type == 1 :
+            c, confidence = self.collapse_best_valid(p, valid)
+        elif type == 2 :
+            c, confidence = self.collapse_random_valid(p, valid)
         g = self.gradient(inputs, c)
         self.update(g)
-        return c, confidence
-    
-    def train_valid_orig(self, inputs, valid, strength=1.):
-        '''
-        Computes a collapsed output with the neural net from the inputs given. 
-        The generated output is tested against the set of valid outputs. If 
-        the output is valid, that output is returned. Otherwise, the neural net 
-        is adjusted at the strength given (default 1.) to fit the valid outputs. 
-        The process repeats until the output generated is valid.
-        '''
-        hc = True
-        while hc:
-            p = self.predict(inputs)
-            c, confidence = self.collapse_random(p)
-            hc = self.has_conflicts(c, valid)
-            if hc:
-                g = self.gradient(inputs, valid)
-                self.update(g)
-                self.reward_prev(strength)
-            else:
-                g = self.gradient(inputs, c)
-                self.update(g)
         return c, confidence
     
     def update(self, gradient):
