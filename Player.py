@@ -71,7 +71,7 @@ class Player(object):
 
 class NN_Player(Player):
     
-    def __init__(self, team):
+    def __init__(self, team, filename=None, type=None):
         '''
         Requests a neural net file name from the user, 
         assuming the file is in the Saved_Neural_Nets/TTT/ 
@@ -79,12 +79,16 @@ class NN_Player(Player):
         '''
         self.team = team
         
-        subdir = 'Saved_Neural_Nets/TTT/'
-        question = 'Which file from ' + subdir + ' should play on team ' + self._team_letter() + '?\n'
-        self.filename = subdir + self._ask(question)
+        if filename == None :
+            subdir = 'Saved_Neural_Nets/TTT/'
+            question = 'Which file from ' + subdir + ' should play on team ' + self._team_letter() + '?\n'
+            self.filename = subdir + self._ask(question)
+        else:
+            self.filename = filename
         
-        question = 'Should it play its best [b] or be somewhat random [r]?\n'
-        type = self._ask(question)
+        if type == None :
+            question = 'Should it play its best [b] or be somewhat random [r]?\n'
+            type = self._ask(question)
         if type == 'b' :
             self.type = 1
         elif type == 'r' :
@@ -101,7 +105,7 @@ class NN_Player(Player):
             self.nn.save(self.filename)
     
     def draw(self):
-        self.nn.reward(0.1)
+        self.nn.reward(-0.1)
     
     def make_move(self, board):
         input = board.as_vector(self.team)
