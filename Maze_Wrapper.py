@@ -14,7 +14,7 @@ class Maze_Wrapper(object):
 			raise Exception("Given neural net must start with 9 nodes and end with 4.")
 		self.nn = nn
 		self.maze = Maze()
-		self.maze.generate_random()
+		self.maze.generate_basic()
 	
 	def move_once(self):
 		'''
@@ -62,7 +62,7 @@ class Maze_Wrapper(object):
 				print()
 			if hw:
 				break
-		self.maze.generate_random()
+		self.maze.generate_basic()
 		if hw:
 			return True, i
 		return False, -1
