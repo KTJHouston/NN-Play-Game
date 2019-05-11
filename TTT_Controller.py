@@ -366,7 +366,7 @@ class TTT_Controller(object):
         elif winner == self.board.O :
             p = 'O won!'
             self.p2.reward()
-            self.p1.reward()
+            self.p1.punish()
         else:
             p = 'Draw'
             self.p1.draw()
